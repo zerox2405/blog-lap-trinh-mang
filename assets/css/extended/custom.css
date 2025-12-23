@@ -299,34 +299,48 @@ body.home-profile .profile .social-icons {
 /* ===== TOC RIGHT SIDEBAR (single pages: post/about) ===== */
 @media (min-width: 1200px) {
 
-  /* main = container của bài */
+  /* main = container của bài: giảm chiều rộng nội dung + chừa biên phải cho TOC */
   body.single .main {
-    max-width: 1200px !important;
-    width: 96% !important;
-
-    /* chừa chỗ cho TOC bên phải */
-    padding-right: 340px !important;
+    max-width: 1100px !important;
+    width: 100% !important;
+    margin: 0 auto !important;
+    padding-left: var(--gap) !important;
+    padding-right: calc(var(--gap) + 360px) !important; /* leave room for TOC */
   }
 
-  /* toc cố định bên phải */
+  /* toc cố định, gọn bên phải cho trang bài viết */
   body.single .toc {
     position: fixed !important;
-    right: 24px !important;
-    top: 120px !important;
+    right: 28px !important;
+    top: calc(var(--header-height) + 32px) !important;
 
-    width: 300px !important;
-    max-height: calc(100vh - 160px) !important;
+    width: 320px !important;
+    max-height: calc(100vh - (var(--header-height) + 80px)) !important;
     overflow: auto !important;
+
+    background: var(--entry) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 12px !important;
+    padding: 12px !important;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.06) !important;
 
     z-index: 9999 !important;
   }
 
-  /* toc gọn đẹp */
+  /* ToC nội dung (details) styling */
   body.single .toc details {
-    background: var(--entry) !important;
-    border: 1px solid var(--border) !important;
-    border-radius: 14px !important;
-    padding: 10px 12px !important;
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+  }
+
+  /* thu gọn list bên trong TOC */
+  body.single .toc ul {
+    list-style: disc inside !important;
+    margin: 6px 0 !important;
+    padding: 0 6px !important;
+    max-height: calc(100vh - (var(--header-height) + 140px)) !important;
+    overflow: auto !important;
   }
 }
 
