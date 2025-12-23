@@ -279,6 +279,18 @@ body.home-profile .profile .profile_inner {
   align-items: center !important;
 }
 
+/* Force-center profile even when .main uses grid (e.g. homepage rendered as list)
+   This targets the profile direct child of .main so it works regardless of body classes */
+.main > .profile {
+  position: absolute !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  top: calc(var(--header-height) + 40px) !important;
+  max-width: 420px !important;
+  width: auto !important;
+  z-index: 10 !important;
+}
+
 /* social icons center */
 body.home-profile .profile .social-icons {
   justify-content: center !important;
