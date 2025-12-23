@@ -1,8 +1,8 @@
 document.addEventListener("DOMContentLoaded", () => {
   console.log("[header-search] loaded");
 
-  // base path: "/" (local root) hoặc "/blog-lap-trinh-mang/" (GH pages)
-  const basePath = (window.__SITE_BASE__ || "/").replace(/\/?$/, "/");
+  // base path: hardcode cho GH Pages
+  const basePath = "/blog-lap-trinh-mang/";
 
   // url tuyệt đối tới index.json
   const indexUrl = new URL(basePath + "index.json", window.location.origin).toString();
