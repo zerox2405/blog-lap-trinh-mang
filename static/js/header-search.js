@@ -1,34 +1,30 @@
 document.addEventListener("DOMContentLoaded", () => {
   console.log("[header-search] loaded");
 
-  // 1) tìm đúng menu link Search trong #menu
+  const base = (window.__SITE_BASE__ || "/").replace(/\/?$/, "/"); // luôn có dấu / cuối
+
+  // tìm menu + link Search
   const menu = document.querySelector("#menu");
   if (!menu) return;
 
   const links = Array.from(menu.querySelectorAll("a[href]"));
   const searchLink = links.find((a) => {
-    try {
-      const u = new URL(a.href, window.location.origin);
-      return /\/search\/?$/.test(u.pathname);
-    } catch {
-      return /\/search\/?$/.test(a.getAttribute("href") || "");
-    }
+    const href = a.getAttribute("href") || "";
+    // match /search/ hoặc .../search/
+    return /(^|\/)search\/?$/.test(href);
   });
   if (!searchLink) return;
 
   const hostLi = searchLink.closest("li") || searchLink.parentElement;
   if (!hostLi) return;
-
+  hostLi.classList.add("search-li"); // để CSS bám đúng LI
   hostLi.style.position = "relative";
 
   let inputEl = null;
   let dropdownEl = null;
   let indexData = null;
-  let cleanupFns = [];
-  let lastQuery = "";
   let debounceTimer = null;
 
-  // ========= utils =========
   const escapeHtml = (s) =>
     (s ?? "")
       .toString()
@@ -39,7 +35,6 @@ document.addEventListener("DOMContentLoaded", () => {
       .replace(/'/g, "&#039;");
 
   const escapeRegExp = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-
   const highlight = (text, q) => {
     if (!q) return escapeHtml(text);
     const re = new RegExp(escapeRegExp(q), "gi");
@@ -48,8 +43,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function loadIndex() {
     if (indexData) return indexData;
-    const res = await fetch("/index.json", { cache: "no-store" });
-    if (!res.ok) throw new Error("Cannot load /index.json");
+
+    // QUAN TRỌNG: dùng base + index.json (không dùng /index.json)
+    const url = base + "index.json";
+    const res = await fetch(url, { cache: "no-store" });
+
+    if (!res.ok) throw new Error(`Cannot load ${url} (${res.status})`);
     indexData = await res.json();
     return indexData;
   }
@@ -62,27 +61,17 @@ document.addEventListener("DOMContentLoaded", () => {
     return dropdownEl;
   }
 
-  function clearDropdown() {
-    if (dropdownEl) dropdownEl.innerHTML = "";
-  }
-
   function closeSearch() {
     if (debounceTimer) clearTimeout(debounceTimer);
     debounceTimer = null;
-    lastQuery = "";
 
     if (dropdownEl) dropdownEl.remove();
     if (inputEl) inputEl.remove();
-
     dropdownEl = null;
     inputEl = null;
 
-    // hiện lại chữ Search (NHƯNG giữ đúng layout)
     searchLink.style.visibility = "";
     searchLink.style.pointerEvents = "";
-
-    cleanupFns.forEach((fn) => fn());
-    cleanupFns = [];
   }
 
   function scoreItem(it, q) {
@@ -93,13 +82,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let s = 0;
     if (title.includes(q)) s += 5;
+    if (title.startsWith(q)) s += 2;
     if (tags.includes(q)) s += 3;
     if (summary.includes(q)) s += 2;
     if (content.includes(q)) s += 1;
-
-    // ưu tiên match từ đầu title
-    if (title.startsWith(q)) s += 2;
-
     return s;
   }
 
@@ -122,18 +108,9 @@ document.addEventListener("DOMContentLoaded", () => {
       .map((it) => {
         const title = it.title || "(No title)";
         const url = it.relpermalink || it.permalink || "#";
-        const tags = Array.isArray(it.tags) && it.tags.length ? it.tags : [];
-
-        const titleHtml = highlight(title, q);
-
-        const tagsHtml = tags.length
-          ? `<div class="hs-tags">${escapeHtml(tags.join(" • "))}</div>`
-          : "";
-
         return `
           <a class="hs-item" href="${escapeHtml(url)}">
-            <div class="hs-title">${titleHtml}</div>
-            ${tagsHtml}
+            ${highlight(title, q)}
           </a>
         `;
       })
@@ -143,12 +120,11 @@ document.addEventListener("DOMContentLoaded", () => {
   async function doSearch(q) {
     const qLower = q.trim().toLowerCase();
     if (!qLower) {
-      clearDropdown();
+      if (dropdownEl) dropdownEl.innerHTML = "";
       return;
     }
 
     const data = await loadIndex();
-
     const results = data
       .map((it) => ({ it, s: scoreItem(it, qLower) }))
       .filter((x) => x.s > 0)
@@ -159,10 +135,9 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function openSearch() {
-    // toggle
     if (inputEl) return closeSearch();
 
-    // ẨN nhưng GIỮ CHỖ -> nav không nhảy
+    // ẩn chữ Search nhưng giữ chỗ để menu không nhảy
     searchLink.style.visibility = "hidden";
     searchLink.style.pointerEvents = "none";
 
@@ -173,7 +148,7 @@ document.addEventListener("DOMContentLoaded", () => {
     inputEl.autocomplete = "off";
     inputEl.spellcheck = false;
 
-    // Quan trọng: absolute để không làm menu bị đẩy / nhảy
+    // không làm menu wrap/nhảy
     inputEl.style.position = "absolute";
     inputEl.style.right = "0";
     inputEl.style.top = "50%";
@@ -183,22 +158,14 @@ document.addEventListener("DOMContentLoaded", () => {
     hostLi.appendChild(inputEl);
     inputEl.focus();
 
-    // input event (debounce)
-    const onInput = () => {
+    inputEl.addEventListener("input", () => {
       const q = inputEl.value;
-      lastQuery = q;
-
       if (debounceTimer) clearTimeout(debounceTimer);
       debounceTimer = setTimeout(() => {
-        doSearch(lastQuery).catch((err) => {
-          console.error("[header-search] search error:", err);
-        });
+        doSearch(q).catch((err) => console.error("[header-search]", err));
       }, 80);
-    };
+    });
 
-    inputEl.addEventListener("input", onInput);
-
-    // Enter -> vào kết quả đầu tiên
     inputEl.addEventListener("keydown", (ev) => {
       if (ev.key === "Escape") {
         ev.preventDefault();
@@ -211,36 +178,34 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
 
-    // Click outside -> close
-    const onDocPointerDown = (e) => {
+    // click ra ngoài => đóng
+    const onDocDown = (e) => {
       if (!inputEl) return;
-      const inside = hostLi.contains(e.target);
-      if (!inside) closeSearch();
+      if (!hostLi.contains(e.target)) closeSearch();
     };
-    document.addEventListener("pointerdown", onDocPointerDown, true);
-    cleanupFns.push(() =>
-      document.removeEventListener("pointerdown", onDocPointerDown, true)
-    );
+    document.addEventListener("pointerdown", onDocDown, true);
 
-    // Click vào item -> cho phép đi link (đừng bị close sớm)
-    const onDdPointerDown = (e) => {
-      const a = e.target.closest("a.hs-item");
-      if (a) {
-        // không đóng ngay, để browser xử lý navigate mượt
-        // closeSearch(); // optional
-      }
+    // cleanup khi đóng
+    const oldClose = closeSearch;
+    closeSearch = () => {
+      document.removeEventListener("pointerdown", onDocDown, true);
+      oldClose();
     };
-    const dd = ensureDropdown();
-    dd.addEventListener("pointerdown", onDdPointerDown, true);
-    cleanupFns.push(() => dd.removeEventListener("pointerdown", onDdPointerDown, true));
   }
 
-  // 2) chặn nhảy trang Search và mở input inline
-  searchLink.addEventListener(
+  // CHẶN NHẢY TRANG SEARCH: bắt click CAPTURE toàn document
+  document.addEventListener(
     "click",
     (e) => {
+      const a = e.target.closest("a");
+      if (!a) return;
+
+      const href = (a.getAttribute("href") || "").trim();
+      if (!/(^|\/)search\/?$/.test(href)) return;
+
       e.preventDefault();
       e.stopPropagation();
+      e.stopImmediatePropagation();
       openSearch();
     },
     true

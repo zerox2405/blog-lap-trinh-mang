@@ -1,2 +1,6 @@
-<script defer src="/js/header-search.js"></script>
-<script defer src="/js/home-profile-center.js"></script>
+<script>
+  // / trên local root, hoặc /blog-lap-trinh-mang/ trên GitHub Pages
+  window.__SITE_BASE__ = '{{ "/" | relURL }}';
+</script>
+
+<script defer src='{{ "js/header-search.js" | relURL }}'></script>
