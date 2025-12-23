@@ -157,6 +157,9 @@ document.addEventListener("DOMContentLoaded", () => {
     hostLi.appendChild(inputEl);
     inputEl.focus();
 
+    // Hiển thị gợi ý mặc định ngay khi mở
+    doSearch("").catch((err) => console.error("[header-search]", err));
+
     inputEl.addEventListener("input", () => {
       const q = inputEl.value;
       if (debounceTimer) clearTimeout(debounceTimer);
