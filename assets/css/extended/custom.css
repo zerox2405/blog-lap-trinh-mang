@@ -333,3 +333,7 @@ body.home-profile .profile .social-icons {
   display: block !important;
   margin: 0 auto !important;
 }
+
+.profile_inner {
+  margin: 0 auto !important;
+}
