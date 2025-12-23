@@ -332,6 +332,7 @@ body.home-profile .profile .social-icons {
 .profile img {
   display: block !important;
   margin: 0 auto !important;
+  transform: translateX(30px); /* nhích sang phải 30px */
 }
 
 .profile_inner {
