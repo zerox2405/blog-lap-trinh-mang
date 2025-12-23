@@ -7,6 +7,11 @@ document.addEventListener("DOMContentLoaded", () => {
     document.body.classList.add("home-profile");
   }
   
+  // nếu có ToC thì thêm class lên body để CSS có thể target (dùng cho About, Page, Post...)
+  if (document.querySelector('.toc')) {
+    document.body.classList.add('has-toc');
+  }
+
   // cố định style client-side để đảm bảo profile nằm giữa bất kể stylesheet nào
   function applyInlineCenter() {
     const main = document.querySelector('.main');
