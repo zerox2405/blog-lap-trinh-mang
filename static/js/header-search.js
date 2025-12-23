@@ -116,7 +116,10 @@ document.addEventListener("DOMContentLoaded", () => {
   async function doSearch(q) {
     const qLower = q.trim().toLowerCase();
     if (!qLower) {
-      if (dropdownEl) dropdownEl.innerHTML = "";
+      // Hiển thị top 8 bài khi chưa nhập gì
+      const data = await loadIndex();
+      const results = data.slice(0, 8).map((it) => ({ it, s: 1 }));
+      renderResults(q, results);
       return;
     }
 
