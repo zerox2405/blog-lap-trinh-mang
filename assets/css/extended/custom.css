@@ -240,13 +240,18 @@ body.home-profile main.main {
   max-width: 100% !important;
   width: 100% !important;
 
-  /* bỏ display flex để dùng profile-mode.css mặc định */
-  /* display: flex !important; */
-  /* justify-content: center !important; */
+  /* sử dụng flex để căn giữa toàn bộ nội dung main trên trang homepage */
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
 
-  /* căn giữa theo chiều dọc (tùy bạn chỉnh số) */
-  min-height: calc(100vh - 140px);
-  /* align-items: center !important; */
+  /* bỏ padding mặc định để không offset sang trái */
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+
+  /* căn giữa theo chiều dọc */
+  min-height: calc(100vh - var(--header-height) - var(--footer-height)) !important;
 }
 
 /* Force center profile */
