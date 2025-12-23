@@ -240,12 +240,13 @@ body.home-profile main.main {
   max-width: 100% !important;
   width: 100% !important;
 
-  display: flex !important;
-  justify-content: center !important;
+  /* bỏ display flex để dùng profile-mode.css mặc định */
+  /* display: flex !important; */
+  /* justify-content: center !important; */
 
   /* căn giữa theo chiều dọc (tùy bạn chỉnh số) */
   min-height: calc(100vh - 140px);
-  align-items: center !important;
+  /* align-items: center !important; */
 }
 
 /* Force center profile */
