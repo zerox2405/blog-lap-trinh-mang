@@ -327,3 +327,9 @@ body.home-profile .profile .social-icons {
 .header-search-dd .hs-item.active{
   background: var(--code-bg);
 }
+
+/* ===== CENTER AVATAR ON HOMEPAGE ===== */
+.profile img {
+  display: block;
+  margin: 0 auto;
+}
