@@ -300,3 +300,30 @@ body.home-profile .profile .social-icons {
     padding: 10px 12px !important;
   }
 }
+
+.header-search-dd .hs-title{
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.header-search-dd .hs-summary{
+  font-size: 13px;
+  opacity: .85;
+  margin-bottom: 4px;
+}
+
+.header-search-dd .hs-tags{
+  font-size: 12px;
+  opacity: .75;
+  margin-bottom: 6px;
+}
+
+.header-search-dd .hs-url{
+  font-size: 12px;
+  opacity: .6;
+}
+
+/* item đang chọn (arrow up/down) */
+.header-search-dd .hs-item.active{
+  background: var(--code-bg);
+}

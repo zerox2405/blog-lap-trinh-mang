@@ -1,30 +1,45 @@
 document.addEventListener("DOMContentLoaded", () => {
   console.log("[header-search] loaded");
 
-  const base = (window.__SITE_BASE__ || "/").replace(/\/?$/, "/"); // luôn có dấu / cuối
-
-  // tìm menu + link Search
+  // ===== 1) Tìm link Search trong menu =====
   const menu = document.querySelector("#menu");
   if (!menu) return;
 
-  const links = Array.from(menu.querySelectorAll("a[href]"));
-  const searchLink = links.find((a) => {
-    const href = a.getAttribute("href") || "";
-    // match /search/ hoặc .../search/
-    return /(^|\/)search\/?$/.test(href);
+  const searchLink = Array.from(menu.querySelectorAll("a[href]")).find((a) => {
+    try {
+      const u = new URL(a.getAttribute("href"), window.location.origin);
+      return /\/search\/?$/.test(u.pathname);
+    } catch {
+      return false;
+    }
   });
   if (!searchLink) return;
 
   const hostLi = searchLink.closest("li") || searchLink.parentElement;
   if (!hostLi) return;
-  hostLi.classList.add("search-li"); // để CSS bám đúng LI
+
+  hostLi.classList.add("search-li");
   hostLi.style.position = "relative";
+
+  // ===== 2) Tính basePath & indexUrl đúng cho GH Pages + local =====
+  // ví dụ: https://.../blog-lap-trinh-mang/search/  -> basePath = /blog-lap-trinh-mang/
+  const basePath = (() => {
+    try {
+      const u = new URL(searchLink.getAttribute("href"), window.location.origin);
+      return u.pathname.replace(/\/search\/?$/, "/");
+    } catch {
+      return (window.__SITE_BASE__ || "/").replace(/\/?$/, "/");
+    }
+  })();
+
+  const indexUrl = basePath + "index.json";
 
   let inputEl = null;
   let dropdownEl = null;
   let indexData = null;
   let debounceTimer = null;
 
+  // ===== Utils =====
   const escapeHtml = (s) =>
     (s ?? "")
       .toString()
@@ -35,6 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
       .replace(/'/g, "&#039;");
 
   const escapeRegExp = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
   const highlight = (text, q) => {
     if (!q) return escapeHtml(text);
     const re = new RegExp(escapeRegExp(q), "gi");
@@ -44,11 +60,9 @@ document.addEventListener("DOMContentLoaded", () => {
   async function loadIndex() {
     if (indexData) return indexData;
 
-    // QUAN TRỌNG: dùng base + index.json (không dùng /index.json)
-    const url = base + "index.json";
-    const res = await fetch(url, { cache: "no-store" });
+    const res = await fetch(indexUrl, { cache: "no-store" });
+    if (!res.ok) throw new Error(`Cannot load ${indexUrl} (${res.status})`);
 
-    if (!res.ok) throw new Error(`Cannot load ${url} (${res.status})`);
     indexData = await res.json();
     return indexData;
   }
@@ -81,8 +95,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const tags = Array.isArray(it.tags) ? it.tags.join(" ").toLowerCase() : "";
 
     let s = 0;
-    if (title.includes(q)) s += 5;
-    if (title.startsWith(q)) s += 2;
+    if (title.includes(q)) s += 6;
+    if (title.startsWith(q)) s += 3;
     if (tags.includes(q)) s += 3;
     if (summary.includes(q)) s += 2;
     if (content.includes(q)) s += 1;
@@ -108,9 +122,16 @@ document.addEventListener("DOMContentLoaded", () => {
       .map((it) => {
         const title = it.title || "(No title)";
         const url = it.relpermalink || it.permalink || "#";
+        const tags = Array.isArray(it.tags) ? it.tags : [];
+
         return `
           <a class="hs-item" href="${escapeHtml(url)}">
-            ${highlight(title, q)}
+            <div class="hs-title">${highlight(title, q)}</div>
+            ${
+              tags.length
+                ? `<div class="hs-tags">${escapeHtml(tags.join(" • "))}</div>`
+                : ""
+            }
           </a>
         `;
       })
@@ -137,7 +158,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function openSearch() {
     if (inputEl) return closeSearch();
 
-    // ẩn chữ Search nhưng giữ chỗ để menu không nhảy
+    // Ẩn chữ Search nhưng giữ chỗ (không nhảy layout)
     searchLink.style.visibility = "hidden";
     searchLink.style.pointerEvents = "none";
 
@@ -148,7 +169,6 @@ document.addEventListener("DOMContentLoaded", () => {
     inputEl.autocomplete = "off";
     inputEl.spellcheck = false;
 
-    // không làm menu wrap/nhảy
     inputEl.style.position = "absolute";
     inputEl.style.right = "0";
     inputEl.style.top = "50%";
@@ -162,7 +182,9 @@ document.addEventListener("DOMContentLoaded", () => {
       const q = inputEl.value;
       if (debounceTimer) clearTimeout(debounceTimer);
       debounceTimer = setTimeout(() => {
-        doSearch(q).catch((err) => console.error("[header-search]", err));
+        doSearch(q).catch((err) =>
+          console.error("[header-search] search error:", err)
+        );
       }, 80);
     });
 
@@ -185,23 +207,30 @@ document.addEventListener("DOMContentLoaded", () => {
     };
     document.addEventListener("pointerdown", onDocDown, true);
 
-    // cleanup khi đóng
-    const oldClose = closeSearch;
+    // gỡ listener khi đóng
+    const _close = closeSearch;
     closeSearch = () => {
       document.removeEventListener("pointerdown", onDocDown, true);
-      oldClose();
+      _close();
     };
   }
 
-  // CHẶN NHẢY TRANG SEARCH: bắt click CAPTURE toàn document
+  // ===== 4) Chặn nhảy sang /search/ (capture) =====
   document.addEventListener(
     "click",
     (e) => {
-      const a = e.target.closest("a");
+      const a = e.target.closest("a[href]");
       if (!a) return;
 
-      const href = (a.getAttribute("href") || "").trim();
-      if (!/(^|\/)search\/?$/.test(href)) return;
+      let path = "";
+      try {
+        const u = new URL(a.getAttribute("href"), window.location.origin);
+        path = u.pathname;
+      } catch {
+        return;
+      }
+
+      if (!/\/search\/?$/.test(path)) return;
 
       e.preventDefault();
       e.stopPropagation();
@@ -210,4 +239,7 @@ document.addEventListener("DOMContentLoaded", () => {
     },
     true
   );
+
+  // log để bạn debug nhanh
+  console.log("[header-search] indexUrl =", indexUrl);
 });
