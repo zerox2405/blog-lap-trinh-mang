@@ -248,6 +248,11 @@ body.home-profile main.main {
   align-items: center !important;
 }
 
+/* Force center profile */
+.profile {
+  margin: 0 auto !important;
+}
+
 /* profile block */
 body.home-profile .profile {
   width: 100% !important;
