@@ -330,6 +330,6 @@ body.home-profile .profile .social-icons {
 
 /* ===== CENTER AVATAR ON HOMEPAGE ===== */
 .profile img {
-  display: block;
-  margin: 0 auto;
+  display: block !important;
+  margin: 0 auto !important;
 }
