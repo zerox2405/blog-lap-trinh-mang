@@ -260,11 +260,17 @@ body.home-profile main.main {
 }
 
 /* profile block */
+/* Make profile an anchored block centered inside main */
 body.home-profile .profile {
-  width: 100% !important;
+  width: auto !important;
+  max-width: 420px !important;
   text-align: center !important;
-  display: flex !important;
-  justify-content: center !important;
+  display: block !important;
+  position: absolute !important; /* position relative to main (which is relative) */
+  left: 50% !important;
+  transform: translateX(-50%) !important; /* center horizontally */
+  top: calc(var(--header-height) + 40px) !important; /* tweak this value to move up/down */
+  z-index: 10 !important;
 }
 
 body.home-profile .profile .profile_inner {
