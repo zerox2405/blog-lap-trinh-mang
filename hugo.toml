@@ -22,7 +22,7 @@ theme = "PaperMod"
     weight = 4
   [[menu.main]]
     name = "Search"
-    url = "/search/"
+    url = "search/"
     weight = 5
 
 [params]
