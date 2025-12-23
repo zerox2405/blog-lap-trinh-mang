@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // base path: hardcode cho GH Pages
   const basePath = "/blog-lap-trinh-mang/";
+  console.log("[header-search] basePath =", basePath);
 
   // url tuyệt đối tới index.json
   const indexUrl = new URL(basePath + "index.json", window.location.origin).toString();
