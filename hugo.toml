@@ -1,0 +1,61 @@
+baseURL = "https://zerox2405.github.io/blog-java-js/"
+languageCode = "vi"
+title = "Blog Lập Trình Mạng - Java & JavaScript"
+theme = "PaperMod"
+
+[menu]
+  [[menu.main]]
+    name = "Home"
+    url = "/"
+    weight = 1
+  [[menu.main]]
+    name = "Blog"
+    url = "/posts/"
+    weight = 2
+  [[menu.main]]
+    name = "About"
+    url = "/about/"
+    weight = 3
+  [[menu.main]]
+    name = "Tags"
+    url = "/tags/"
+    weight = 4
+  [[menu.main]]
+    name = "Search"
+    url = "/search/"
+    weight = 5
+
+[params]
+  author = "thinh"
+  description = "Chia sẻ Java & JavaScript (lập trình mạng) bằng tiếng Việt."
+  ShowToc = true
+  TocOpen = true
+  ShowReadingTime = true
+  ShowShareButtons = true
+  ShowPostNavLinks = true
+  ShowBreadCrumbs = true
+  ShowCodeCopyButtons = true
+
+[params.assets]
+  customCSS = ["css/extended/custom.css"]
+  customJS  = ["js/search-popup.js"]
+
+[params.profileMode]
+  enabled = true
+  title = "Thịnh 👋"
+  subtitle = "Java & JavaScript • HTTP/REST • Socket • WebSocket"
+  imageUrl = "img/avatar.png"
+  imageTitle = "avatar"
+  imageWidth = 140
+  imageHeight = 140
+
+[[params.socialIcons]]
+  name = "github"
+  url = "https://github.com/zerox2405"
+
+[[params.socialIcons]]
+  name = "email"
+  url = "mailto:thinh.ndt2004@gmail.com"
+
+[outputs]
+  home = ["HTML", "RSS", "JSON"]

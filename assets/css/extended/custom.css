@@ -1,0 +1,302 @@
+/* =========================================================
+   CUSTOM.CSS (PaperMod)
+   - Posts list: wide + grid + title-only
+   - TOC: fixed right sidebar (desktop)
+   - Header search: inline input + dropdown suggestions
+   - Home profile: center avatar + text
+   ========================================================= */
+
+
+/* =========================
+   HOME PROFILE: CENTER AVATAR + TEXT
+   ========================= */
+
+body.home .profile {
+  text-align: center !important;
+}
+
+body.home .profile .profile_inner {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+body.home .profile img {
+  display: block !important;
+  margin: 0 auto !important;
+}
+
+body.home .profile .subtitle,
+body.home .profile .social-icons {
+  justify-content: center !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+
+/* =========================
+   POSTS LIST: WIDE + GRID + TITLE ONLY
+   ========================= */
+
+@media (min-width: 900px) {
+  body.list .main {
+    max-width: 1400px !important;
+    width: 96% !important;
+  }
+}
+
+@media (min-width: 1100px) {
+  body.list main.main {
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 18px !important;
+    align-items: stretch;
+  }
+
+  body.list main.main > header,
+  body.list main.main .pagination {
+    grid-column: 1 / -1;
+  }
+
+  body.list .post-entry {
+    margin: 0 !important;
+    width: 100%;
+  }
+}
+
+@media (min-width: 700px) and (max-width: 1099px) {
+  body.list main.main {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 16px !important;
+  }
+
+  body.list main.main > header,
+  body.list main.main .pagination {
+    grid-column: 1 / -1;
+  }
+
+  body.list .post-entry {
+    margin: 0 !important;
+    width: 100%;
+  }
+}
+
+body.list .post-entry .entry-cover img {
+  width: 100% !important;
+  height: 160px !important;
+  object-fit: cover !important;
+  border-radius: 14px !important;
+}
+
+/* hide summary + meta */
+body.list .post-entry .entry-content,
+body.list .post-entry .entry-footer {
+  display: none !important;
+}
+
+body.list .post-entry .entry-header h2 {
+  font-size: 18px !important;
+  line-height: 1.25 !important;
+  margin: 10px 0 0 0 !important;
+}
+
+body.list .post-entry {
+  border-radius: 18px !important;
+}
+
+
+/* =========================
+   TOC: FIXED RIGHT SIDEBAR (DESKTOP)
+   ========================= */
+
+@media (min-width: 1200px) {
+  body.single .main {
+    padding-right: 340px;
+  }
+
+  body.single .toc {
+    position: fixed !important;
+    right: 24px;
+    top: 120px;
+    width: 290px;
+    max-height: calc(100vh - 160px);
+    overflow: auto;
+    z-index: 50;
+  }
+
+  body.single .toc details {
+    background: var(--entry);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 10px 12px;
+  }
+}
+
+
+/* =========================
+   HEADER INLINE SEARCH (NO POPUP PAGE)
+   ========================= */
+
+/* 1) Giữ header/menu 1 hàng (đừng wrap) */
+.header .nav,
+header.header .nav,
+.nav,
+.menu {
+  flex-wrap: nowrap !important;
+}
+
+/* 2) Cho phép dropdown tràn ra ngoài */
+.header, .nav, .menu, #menu, #menu ul {
+  overflow: visible !important;
+}
+
+/* 3) (Quan trọng) chỉ position relative cho đúng LI của Search
+   -> JS nên add class "search-li" vào <li> chứa Search
+*/
+#menu li.search-li {
+  position: relative;
+}
+
+/* Input */
+.header-search-input {
+  width: 220px;
+  height: 34px;
+  padding: 0 10px;
+  margin: 0;
+
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--theme);
+  color: var(--primary);
+  outline: none;
+
+  font-size: 14px;
+  line-height: 34px;
+
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* Dropdown */
+.header-search-dd {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 360px;
+
+  max-height: 360px;
+  overflow: auto;
+
+  background: var(--entry);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+
+  box-shadow: 0 12px 30px rgba(0,0,0,.10);
+  z-index: 99999 !important;
+  padding: 6px;
+}
+
+.header-search-dd .hs-item {
+  display: block;
+  padding: 10px 10px;
+  border-radius: 10px;
+  text-decoration: none;
+  color: var(--primary);
+  font-size: 14px;
+}
+
+.header-search-dd .hs-item:hover {
+  background: var(--code-bg);
+}
+
+.header-search-dd .hs-empty {
+  padding: 10px;
+  color: var(--secondary);
+  font-size: 14px;
+}
+
+.header-search-dd mark {
+  background: transparent;
+  text-decoration: underline;
+  font-weight: 700;
+}
+
+/* Mobile */
+@media (max-width: 700px) {
+  .header-search-dd {
+    right: auto;
+    left: 0;
+    width: min(92vw, 360px);
+  }
+  .header-search-input {
+    width: min(60vw, 220px);
+  }
+}
+
+/* ===== HOME PROFILE CENTER (only homepage) ===== */
+body.home-profile main.main {
+  max-width: 100% !important;
+  width: 100% !important;
+
+  display: flex !important;
+  justify-content: center !important;
+
+  /* căn giữa theo chiều dọc (tùy bạn chỉnh số) */
+  min-height: calc(100vh - 140px);
+  align-items: center !important;
+}
+
+/* profile block */
+body.home-profile .profile {
+  width: 100% !important;
+  text-align: center !important;
+  display: flex !important;
+  justify-content: center !important;
+}
+
+body.home-profile .profile .profile_inner {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+}
+
+/* social icons center */
+body.home-profile .profile .social-icons {
+  justify-content: center !important;
+}
+
+/* ===== TOC RIGHT SIDEBAR (single pages: post/about) ===== */
+@media (min-width: 1200px) {
+
+  /* main = container của bài */
+  body.single .main {
+    max-width: 1200px !important;
+    width: 96% !important;
+
+    /* chừa chỗ cho TOC bên phải */
+    padding-right: 340px !important;
+  }
+
+  /* toc cố định bên phải */
+  body.single .toc {
+    position: fixed !important;
+    right: 24px !important;
+    top: 120px !important;
+
+    width: 300px !important;
+    max-height: calc(100vh - 160px) !important;
+    overflow: auto !important;
+
+    z-index: 9999 !important;
+  }
+
+  /* toc gọn đẹp */
+  body.single .toc details {
+    background: var(--entry) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 14px !important;
+    padding: 10px 12px !important;
+  }
+}
